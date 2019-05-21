@@ -56,6 +56,10 @@ def answer(first, second, third):
     return statement(msg)
 
 
+@ask.intent("NoIntent")
+def no_intent():
+    return statement("Oh sad, come back when you feel like you want to play.")
+
 if __name__ == '__main__':
 
     app.run(debug=True)
