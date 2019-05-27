@@ -139,9 +139,18 @@ def received_greet():
 @ask.intent("affirm")
 def received_affirm():
 
-    msg = render_template('utter_booked')
+    dialog_history = session.attributes.get('dialog_history');
 
-    response = statement(msg)
+    print(f'This is the history: {dialog_history}')
+
+    if dialog_history is not None and len(dialog_history)>0 and dialog_history[-1]['intent'] is not None and dialog_history[-1]['intent']['name'] == 'deny':
+        session.attributes['dialog_frame'] = None
+        session.attributes['dialog_history'] = None
+        msg = render_template('welcome')
+        response = question(msg)
+    else:
+        msg = render_template('utter_booked')
+        response = statement(msg)
 
     return response
 
@@ -149,10 +158,19 @@ def received_affirm():
 @ask.intent("deny")
 def received_deny():
 
-    msg = render_template('utter_goodbye')
+    dialog_history = session.attributes.get('dialog_history');
 
-    return statement(msg)
+    print(f'This is the history: {dialog_history}')
 
+    if dialog_history is not None and len(dialog_history)>0 and dialog_history[-1]['intent'] is not None and dialog_history[-1]['intent']['name'] == 'deny':
+        msg = render_template('utter_goodbye')
+        response = statement(msg)
+    else:
+        update_dialog_history(session, request)
+        msg = render_template('utter_ask_reset')
+        response = question(msg)
+
+    return response
 
 if __name__ == '__main__':
 
